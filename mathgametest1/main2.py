@@ -3,6 +3,7 @@ import os
 import cv2
 import mediapipe as mp
 from game import Game
+import global_variables
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -21,29 +22,19 @@ for imPath in myList:
     resized_image = cv2.resize(image, (250, 214))
     number = int(''.join(filter(str.isdigit, imPath)))
     overlayList[number] = resized_image
-
-
-
-
-
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
-
-
 pygame.init()
-
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption("Math Games")
-
 done = False
-
 clock = pygame.time.Clock()
-
 game = Game()
 
 while not done:
     done = game.process_events()
     game.run_logic()
+    game.check_result()
     game.display_frame(screen)
     with mp_hands.Hands(
             model_complexity=0,
@@ -59,6 +50,7 @@ while not done:
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             fingerCount = 0
+            global_variables.fingerCount = fingerCount
 
             if results.multi_hand_landmarks:
 
@@ -95,6 +87,8 @@ while not done:
                     resized_image = cv2.resize(overlayList[fingerCount], (214, 250))
 
                     image[0:250, 0:214] = resized_image
+            global_variables.fingerCount = fingerCount
+            print(global_variables.fingerCount)
 
             # Display image
             cv2.imshow('MediaPipe Hands', image)

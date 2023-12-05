@@ -19,7 +19,7 @@ overlayList = [None] * len(myList)  # Create a list with the same size as myList
 for imPath in myList:
     image = cv2.imread(f'{folderPath}/{imPath}')
 
-    resized_image = cv2.resize(image, (250, 214))
+    resized_image = cv2.resize(image, (200, 200))
     number = int(''.join(filter(str.isdigit, imPath)))
     overlayList[number] = resized_image
 SCREEN_WIDTH = 640
@@ -84,9 +84,9 @@ while not done:
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style())
 
-                    resized_image = cv2.resize(overlayList[fingerCount], (214, 250))
+                    resized_image = cv2.resize(overlayList[fingerCount], (200, 200))
 
-                    image[0:250, 0:214] = resized_image
+                    image[0:200, 0:200] = resized_image
             global_variables.fingerCount = fingerCount
             print(global_variables.fingerCount)
 

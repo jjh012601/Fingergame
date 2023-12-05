@@ -1,5 +1,5 @@
 import global_variables
-import pygame, random
+import pygame, random, time
 from menu import Menu
 
 SCREEN_WIDTH = 640
@@ -24,6 +24,8 @@ class Game(object):
         self.score = 0
         self.count = 0
         self.background_image = pygame.image.load("background.jpg").convert()
+        self.correct = None
+        self.correct_time = None
 
     def get_symbols(self):
         """ Return a dictionary with all the operation symbols """
@@ -52,8 +54,11 @@ class Game(object):
         if self.problem["result"] == global_variables.fingerCount:
             self.score += 5
             self.reset_problem = True
+            self.correct_time = time.time()
+
     def set_problem(self):
         if self.operation == "addition":
+            time.sleep(0.5)
             self.addition()
 
     def process_events(self):
@@ -79,10 +84,13 @@ class Game(object):
         return False
 
     def run_logic(self):
-        # Update menu
         self.menu.update()
+        if global_variables.fingerCount == self.problem["result"]:
+            self.correct = True
+            self.correct_time = time.time()  # 정답을 맞춘 시간을 저장합니다.
+            time.sleep(0.5)  # 정답을 맞추고 0.5초 동안 대기합니다.
 
-        
+
     def display_message(self,screen,items):
         """ display every string that is inside of a tuple(args) """
         for index, message in enumerate(items):
@@ -125,7 +133,23 @@ class Game(object):
             screen.blit(label_2,(posX + label_1.get_width() + 64,50))
             score_label = self.score_font.render("Score: "+str(self.score),True,BLACK)
             screen.blit(score_label,(10,10))
-            
+            # 스크린에 fingerCount 폰트 출력
+            finger_font = pygame.font.Font(None, 150)
+            finger_surface = finger_font.render(str(global_variables.fingerCount), True, (0, 0, 0))
+            posX = (SCREEN_WIDTH / 2) - (finger_surface.get_width() / 2)
+            posY = (SCREEN_HEIGHT / 2)
+            screen.blit(finger_surface, (posX, posY))
+
+            if self.correct is not None:  # None이 아니라면 이미 정답 여부가 결정된 상태입니다.
+                result_font = pygame.font.Font(None, 300)  # 더 큰 글꼴
+                if self.correct:
+                    result_surface = result_font.render('O', True, (0, 255, 0))  # 맞았을 때는 초록색 'O'
+                    posX = (SCREEN_WIDTH / 2) - (result_surface.get_width() / 2)
+                    posY = (SCREEN_HEIGHT / 2) - 50
+                    screen.blit(result_surface, (posX, posY))
+
+                    if time.time() -self.correct_time >0.3:
+                        self.correct = None
 
         pygame.display.flip()
 

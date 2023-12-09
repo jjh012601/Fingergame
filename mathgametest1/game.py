@@ -72,6 +72,7 @@ class Game(object):
                         self.set_problem()
                         self.show_menu = False
                         self.score = 0
+                        self.count = 0
                 else:
                     self.check_result()
             elif event.type == pygame.KEYDOWN:
@@ -115,8 +116,8 @@ class Game(object):
         if self.show_menu:
             self.menu.display_frame(screen)
         elif self.count == 20:
-            msg_1 = "You answered " + str(self.score / 5) + " correctly"
-            msg_2 = "Your score was " + str(self.score)
+            msg_1 = "CORRECTED : " + str(self.score / 5)
+            msg_2 = "SCORE : " + str(self.score)
             self.display_message(screen,(msg_1,msg_2))
             self.show_menu = True
             # reset score and count to 0

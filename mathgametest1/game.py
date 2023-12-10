@@ -27,6 +27,7 @@ class Game(object):
         self.correct = None
         self.correct_time = None
         self.incorrect_time = None
+        self.countdown = 3
 
     def get_symbols(self):
         """ Return a dictionary with all the operation symbols """
@@ -34,6 +35,12 @@ class Game(object):
         sprite_sheet = pygame.image.load("symbols.png").convert()
         image = self.get_image(sprite_sheet,0,0,64,64)
         symbols["addition"] = image
+        image = self.get_image(sprite_sheet, 64, 0, 64, 64)
+        symbols["subtraction"] = image
+        image = self.get_image(sprite_sheet, 128, 0, 64, 64)
+        symbols["multiplication"] = image
+        image = self.get_image(sprite_sheet, 192, 0, 64, 64)
+        symbols["division"] = image
 
         return symbols
 
@@ -44,12 +51,45 @@ class Game(object):
 
     def addition(self):
         """ These will set num1,num2,result for addition """
-        a = random.randint(0,5)
-        b = random.randint(0,5)
+        a = random.randint(0,10)
+        b = random.randint(0, 10-a)
         self.problem["num1"] = a
         self.problem["num2"] = b
         self.problem["result"] = a + b
         self.operation = "addition"
+
+    def subtraction(self):
+        """ These will set num1,num2,result for subtraction """
+        a = random.randint(1, 10)
+        b = random.randint(0, a)
+        self.problem["num1"] = a
+        self.problem["num2"] = b
+        self.problem["result"] = a - b
+        self.operation = "subtraction"
+
+    def multiplication(self):
+        """ These will set num1,num2,result for multiplication """
+        a = random.randint(1, 5)
+        b = random.randint(1, 5)
+        result = a * b
+        while result > 10:
+            a = random.randint(1, 5)
+            b = random.randint(1, 5)
+            result = a * b
+        self.problem["num1"] = a
+        self.problem["num2"] = b
+        self.problem["result"] = result
+        self.operation = "multiplication"
+
+    def division(self):
+        """ These will set num1,num2,result for division """
+        b = random.randint(1,9)
+        a = b * random.randint(1, 9)
+        result = a / b
+        self.problem["num1"] = a
+        self.problem["num2"] = b
+        self.problem["result"] = int(result)
+        self.operation = "division"
 
     def check_result(self):
         if global_variables.fingerCount != -1:
@@ -64,14 +104,25 @@ class Game(object):
                 self.incorrect_time = time.time()  # 처음으로 틀린 손가락이 인식된 시간을 저장합니다.
             elif time.time() - self.incorrect_time > 3:  # 틀린 손가락이 1초 이상 유지되면
                 self.reset_problem = True  # 문제를 초기화합니다.
+                self.correct = False    # 오답 확인
                 self.incorrect_time = None  # incorrect_time을 초기화합니다.
         else:
             self.incorrect_time = None  # 정답이거나 손가락이 인식되지 않았다면 incorrect_time을 초기화합니다.
     def set_problem(self):
-        if self.operation == "addition":
+        operation_type = random.choice(["addition", "subtraction", "multiplication", "division"])
+        if operation_type == "addition":
             time.sleep(0.5)
             self.addition()
-
+        elif operation_type == "subtraction":
+            time.sleep(0.5)
+            self.subtraction()
+        elif operation_type == "multiplication":
+            time.sleep(0.5)
+            self.multiplication()
+        elif operation_type == "division":
+            time.sleep(0.5)
+            self.division()
+        self.operation = operation_type
     def process_events(self):
         for event in pygame.event.get():  # User did something
             if event.type == pygame.QUIT: # If user clicked close
@@ -84,6 +135,7 @@ class Game(object):
                         self.show_menu = False
                         self.score = 0
                         self.count = 0
+                        self.countdown = 3
                 else:
                     self.check_result()
             elif event.type == pygame.KEYDOWN:
@@ -127,6 +179,21 @@ class Game(object):
         time_wait = False
         if self.show_menu:
             self.menu.display_frame(screen)
+        elif self.countdown is not None:
+            countdown_font = pygame.font.Font(None, 300)
+            countdown_surface = countdown_font.render(str(self.countdown), True, (0, 0, 0))
+            posX = (SCREEN_WIDTH / 2) - (countdown_surface.get_width() / 2)
+            posY = (SCREEN_HEIGHT / 2) - 150
+            screen.blit(countdown_surface, (posX, posY))
+            pygame.display.flip()
+            pygame.time.wait(1000)  # 1초 대기
+            self.countdown -= 1
+            if self.countdown == 0:
+                self.countdown = None
+                self.set_problem()
+                self.show_menu = False
+                self.score = 0
+                self.count = 0
         elif self.count == 20:
             msg_1 = "CORRECTED : " + str(self.score / 5)
             msg_2 = "SCORE : " + str(self.score)
@@ -162,12 +229,14 @@ class Game(object):
                 result_font = pygame.font.Font(None, 300)  # 더 큰 글꼴
                 if self.correct:
                     result_surface = result_font.render('O', True, (0, 255, 0))  # 맞았을 때는 초록색 'O'
-                    posX = (SCREEN_WIDTH / 2) - (result_surface.get_width() / 2)
-                    posY = (SCREEN_HEIGHT / 2) - 50
-                    screen.blit(result_surface, (posX, posY))
+                else:
+                    result_surface = result_font.render('X', True, RED)
+                posX = (SCREEN_WIDTH / 2) - (result_surface.get_width() / 2)
+                posY = (SCREEN_HEIGHT / 2) - 50
+                screen.blit(result_surface, (posX, posY))
 
-                    if time.time() -self.correct_time >0.3:
-                        self.correct = None
+                if time.time() -self.correct_time >0.3:
+                    self.correct = None
 
         pygame.display.flip()
 

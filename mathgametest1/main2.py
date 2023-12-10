@@ -15,13 +15,13 @@ folderPath = "FingerImages"
 myList = os.listdir(folderPath)
 print(myList)
 
-overlayList = [None] * len(myList)  # Create a list with the same size as myList
+overlayList = [None] * len(myList)
 for imPath in myList:
     image = cv2.imread(f'{folderPath}/{imPath}')
-
-    resized_image = cv2.resize(image, (200, 200))
+    resized_image = cv2.resize(image, (200, 200))  # Resize image beforehand
     number = int(''.join(filter(str.isdigit, imPath)))
     overlayList[number] = resized_image
+
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 pygame.init()
@@ -30,7 +30,8 @@ pygame.display.set_caption("Math Games")
 done = False
 clock = pygame.time.Clock()
 game = Game()
-
+fingerCount = -1
+global_variables.fingerCount = fingerCount
 while not done:
     done = game.process_events()
     game.run_logic()
@@ -49,10 +50,8 @@ while not done:
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            fingerCount = 0
-            global_variables.fingerCount = fingerCount
-
             if results.multi_hand_landmarks:
+                fingerCount = 0
 
                 for hand_landmarks in results.multi_hand_landmarks:
                     # Get hand index to check label (left or right)
@@ -84,9 +83,11 @@ while not done:
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style())
 
-                    resized_image = cv2.resize(overlayList[fingerCount], (200, 200))
-
+                    resized_image = overlayList[fingerCount]  # No need to resize image here
                     image[0:200, 0:200] = resized_image
+            else:
+                fingerCount = -1
+
             global_variables.fingerCount = fingerCount
             print(global_variables.fingerCount)
 

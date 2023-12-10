@@ -234,9 +234,9 @@ class Game(object):
                 posX = (SCREEN_WIDTH / 2) - (result_surface.get_width() / 2)
                 posY = (SCREEN_HEIGHT / 2) - 50
                 screen.blit(result_surface, (posX, posY))
-
-                if time.time() -self.correct_time >0.3:
-                    self.correct = None
+                if global_variables.fingerCount != -1 and self.correct_time is not None:
+                    if time.time() - self.correct_time > 0.3:
+                        self.correct = None
 
         pygame.display.flip()
 

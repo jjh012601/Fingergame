@@ -229,15 +229,19 @@ class Game(object):
                 result_font = pygame.font.Font(None, 300)  # 더 큰 글꼴
                 if self.correct:
                     result_surface = result_font.render('O', True, (0, 255, 0))  # 맞았을 때는 초록색 'O'
+                    if self.correct_time is None:  # correct_time이 None이면 현재 시간으로 설정
+                        self.correct_time = time.time()
                 else:
                     result_surface = result_font.render('X', True, RED)
+                    if self.correct_time is None:  # correct_time이 None이면 현재 시간으로 설정
+                        self.correct_time = time.time()
                 posX = (SCREEN_WIDTH / 2) - (result_surface.get_width() / 2)
                 posY = (SCREEN_HEIGHT / 2) - 50
                 screen.blit(result_surface, (posX, posY))
-                if global_variables.fingerCount != -1 or self.correct_time is not None:
-                    if time.time() - self.correct_time > 0.5:
-                        self.correct = None
-                        self.correct_time = None
+                if self.correct_time is not None:
+                        if time.time() - self.correct_time > 0.5:
+                            self.correct = None
+                            self.correct_time = None
 
         pygame.display.flip()
 

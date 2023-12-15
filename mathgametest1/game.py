@@ -15,6 +15,8 @@ class Game(object):
         self.font = pygame.font.Font(None,65)
         self.score_font = pygame.font.Font("kenvector_future.ttf",20)
         self.problem = {"num1":0,"num2":0,"result":0}
+        self.previous_problem = None
+        self.previous_result = None
         self.operation = ""
         self.symbols = self.get_symbols()
         self.reset_problem = False
@@ -53,19 +55,15 @@ class Game(object):
         """ These will set num1,num2,result for addition """
         a = random.randint(0,10)
         b = random.randint(0, 10-a)
-        self.problem["num1"] = a
-        self.problem["num2"] = b
-        self.problem["result"] = a + b
-        self.operation = "addition"
+        problem = {"num1": a, "num2": b, "result": a + b, "operation": "addition"}
+        return problem
 
     def subtraction(self):
         """ These will set num1,num2,result for subtraction """
         a = random.randint(1, 10)
         b = random.randint(0, a)
-        self.problem["num1"] = a
-        self.problem["num2"] = b
-        self.problem["result"] = a - b
-        self.operation = "subtraction"
+        problem = {"num1": a, "num2": b, "result": a - b, "operation": "subtraction"}
+        return problem
 
     def multiplication(self):
         """ These will set num1,num2,result for multiplication """
@@ -76,20 +74,16 @@ class Game(object):
             a = random.randint(1, 5)
             b = random.randint(1, 5)
             result = a * b
-        self.problem["num1"] = a
-        self.problem["num2"] = b
-        self.problem["result"] = result
-        self.operation = "multiplication"
+        problem = {"num1": a, "num2": b, "result": a * b, "operation": "multiplication"}
+        return problem
 
     def division(self):
         """ These will set num1,num2,result for division """
         b = random.randint(1,9)
         a = b * random.randint(1, 9)
         result = a / b
-        self.problem["num1"] = a
-        self.problem["num2"] = b
-        self.problem["result"] = int(result)
-        self.operation = "division"
+        problem = {"num1": a, "num2": b, "result": int(result), "operation": "division"}
+        return problem
 
     def check_result(self):
         if global_variables.fingerCount != -1:
@@ -109,20 +103,28 @@ class Game(object):
         else:
             self.incorrect_time = None  # 정답이거나 손가락이 인식되지 않았다면 incorrect_time을 초기화합니다.
     def set_problem(self):
-        operation_type = random.choice(["addition", "subtraction", "multiplication", "division"])
-        if operation_type == "addition":
-            time.sleep(0.5)
-            self.addition()
-        elif operation_type == "subtraction":
-            time.sleep(0.5)
-            self.subtraction()
-        elif operation_type == "multiplication":
-            time.sleep(0.5)
-            self.multiplication()
-        elif operation_type == "division":
-            time.sleep(0.5)
-            self.division()
-        self.operation = operation_type
+        while True:
+            operation_type = random.choice(["addition", "subtraction", "multiplication", "division"])
+            problem = None
+            if operation_type == "addition":
+                time.sleep(0.5)
+                problem = self.addition()
+            elif operation_type == "subtraction":
+                time.sleep(0.5)
+                problem = self.subtraction()
+            elif operation_type == "multiplication":
+                time.sleep(0.5)
+                problem = self.multiplication()
+            elif operation_type == "division":
+                time.sleep(0.5)
+                problem = self.division()
+
+            if self.previous_result is None or self.previous_result != problem["result"]:
+                self.previous_result = problem["result"]
+                self.problem = problem
+                self.operation = problem["operation"]
+                self.previous_problem = problem
+                break
     def process_events(self):
         for event in pygame.event.get():  # User did something
             if event.type == pygame.QUIT: # If user clicked close

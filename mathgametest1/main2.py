@@ -54,7 +54,6 @@ while not done:
                 fingerCount = 0
 
                 for hand_landmarks in results.multi_hand_landmarks:
-                    # Get hand index to check label (left or right)
                     handIndex = results.multi_hand_landmarks.index(hand_landmarks)
                     handLabel = results.multi_handedness[handIndex].classification[0].label
 
@@ -83,7 +82,7 @@ while not done:
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style())
 
-                    resized_image = overlayList[fingerCount]  # No need to resize image here
+                    resized_image = overlayList[fingerCount]
                     image[0:200, 0:200] = resized_image
             else:
                 fingerCount = -1

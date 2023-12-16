@@ -32,7 +32,6 @@ class Game(object):
         self.countdown = 3
 
     def get_symbols(self):
-        """ Return a dictionary with all the operation symbols """
         symbols = {}
         sprite_sheet = pygame.image.load("symbols.png").convert()
         image = self.get_image(sprite_sheet,0,0,64,64)
@@ -52,21 +51,18 @@ class Game(object):
         return image
 
     def addition(self):
-        """ These will set num1,num2,result for addition """
         a = random.randint(0,10)
         b = random.randint(0, 10-a)
         problem = {"num1": a, "num2": b, "result": a + b, "operation": "addition"}
         return problem
 
     def subtraction(self):
-        """ These will set num1,num2,result for subtraction """
         a = random.randint(1, 10)
         b = random.randint(0, a)
         problem = {"num1": a, "num2": b, "result": a - b, "operation": "subtraction"}
         return problem
 
     def multiplication(self):
-        """ These will set num1,num2,result for multiplication """
         a = random.randint(1, 5)
         b = random.randint(1, 5)
         result = a * b
@@ -78,7 +74,6 @@ class Game(object):
         return problem
 
     def division(self):
-        """ These will set num1,num2,result for division """
         b = random.randint(1,9)
         a = b * random.randint(1, 9)
         result = a / b
@@ -95,13 +90,13 @@ class Game(object):
     def check_incorrect(self):
         if self.problem["result"] != global_variables.fingerCount and global_variables.fingerCount != -1:
             if self.incorrect_time is None:
-                self.incorrect_time = time.time()  # 처음으로 틀린 손가락이 인식된 시간을 저장합니다.
+                self.incorrect_time = time.time()  # 처음으로 틀린 손가락이 인식된 시간을 저장.
             elif time.time() - self.incorrect_time > 3:  # 틀린 손가락이 1초 이상 유지되면
-                self.reset_problem = True  # 문제를 초기화합니다.
+                self.reset_problem = True  # 문제를 초기화.
                 self.correct = False    # 오답 확인
                 self.incorrect_time = None  # incorrect_time을 초기화합니다.
         else:
-            self.incorrect_time = None  # 정답이거나 손가락이 인식되지 않았다면 incorrect_time을 초기화합니다.
+            self.incorrect_time = None  # 정답이거나 손가락이 인식되지 않았다면 incorrect_time을 초기화.
     def set_problem(self):
         while True:
             operation_type = random.choice(["addition", "subtraction", "multiplication", "division"])
@@ -126,8 +121,8 @@ class Game(object):
                 self.previous_problem = problem
                 break
     def process_events(self):
-        for event in pygame.event.get():  # User did something
-            if event.type == pygame.QUIT: # If user clicked close
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 return True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.show_menu:
@@ -154,8 +149,8 @@ class Game(object):
         self.check_incorrect()
         if global_variables.fingerCount == self.problem["result"]:
             self.correct = True
-            self.correct_time = time.time()  # 정답을 맞춘 시간을 저장합니다.
-            time.sleep(0.5)  # 정답을 맞추고 0.5초 동안 대기합니다.
+            self.correct_time = time.time()  # 정답을 맞춘 시간을 저장.
+            time.sleep(0.5)  # 정답을 맞추고 0.5초 동안 대기.
 
 
     def display_message(self,screen,items):
@@ -224,10 +219,10 @@ class Game(object):
                 screen.blit(finger_surface, (posX, posY))
                 if self.incorrect_time is not None and time.time() - self.incorrect_time > 1:  # 틀린 손가락이 인식된 시간이 있다면
                     question_font = pygame.font.Font(None, 150)
-                    question_surface = question_font.render('   ?', True, RED)  # 물음표를 빨간색으로 표시합니다.
-                    screen.blit(question_surface, (posX + finger_surface.get_width(), posY))  # 손가락 인식 숫자 옆에 물음표를 출력합니다.
+                    question_surface = question_font.render('   ?', True, RED)  # 물음표를 빨간색으로 표시
+                    screen.blit(question_surface, (posX + finger_surface.get_width(), posY))  # 손가락 인식 숫자 옆에 물음표를 출력.
 
-            if self.correct is not None:  # None이 아니라면 이미 정답 여부가 결정된 상태입니다.
+            if self.correct is not None:  # None이 아니라면 이미 정답 여부가 결정된 상태.
                 result_font = pygame.font.Font(None, 300)  # 더 큰 글꼴
                 if self.correct:
                     result_surface = result_font.render('O', True, (0, 255, 0))  # 맞았을 때는 초록색 'O'
